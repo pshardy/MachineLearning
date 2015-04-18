@@ -1,6 +1,7 @@
 __author__ = 'Patrick Hardy'
 
 import hashlib
+import time
 import pandas as pd
 
 
@@ -36,19 +37,29 @@ print 'Samples, Features ' + str(data.shape)
 
 # TODO: Change this to test different classifiers.
 from sklearn.svm import LinearSVC
-
 from sklearn.neighbors import KNeighborsClassifier
 
 # Train with the sample data.
 clf = KNeighborsClassifier()
-clf.fit(x, yArr)
+
+# Profile time to fit.
+start = time.clock()
+print "Fitting with " + str(clf.fit(x, yArr))
+end = time.clock()
+
+print "\nTime to fit in seconds: " + str(end - start)
 
 # Test the original values to see if the same results are produced.
 test = x.ix[:, 0:14]
 
-# An array of the predicted results.
+# Profile prediction time.
+start = time.clock()
 result = clf.predict(test)
-print result
+end = time.clock()
+
+print "Time to predict in seconds: " + str(end - start)
+
+#print result
 
 # Check for match percent.
 success_count = 0

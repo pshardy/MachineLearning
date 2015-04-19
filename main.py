@@ -5,9 +5,30 @@ import time
 import pandas as pd
 from sklearn import cross_validation
 
+
 # Hash a string into a unique int.
 def hash_str(s):
     return int(hashlib.sha256(s).hexdigest(), 16)
+
+
+def fit_and_score(clf, x_train, x_test, y_train, y_test):
+    # Profile time to fit.
+    start = time.clock()
+    print "Fitting with " + str(clf.fit(x_train, y_train))
+    end = time.clock()
+
+    # Profile prediction time.
+    start_predict = time.clock()
+    result = clf.score(x_test, y_test) #clf.predict(test)
+    end_predict = time.clock()
+
+    print "\nAccuracy: %0.2f%% (+/- %0.2f)" % (result.mean() * 100.0, result.std() * 2 * 100)
+
+    print "\nTime to fit in seconds: %0.5f" % (end - start)
+    print "Time to predict in seconds: %0.5f\n" % (end_predict - start_predict)
+
+    return result
+
 
 #myData = np.genfromtxt("data_files\\Book1.csv", dtype=float, delimiter=',', skip_header=0)
 
@@ -42,26 +63,13 @@ x_train, x_test, y_train, y_test = cross_validation.train_test_split(x, yArr, te
 print 'Samples, Features ' + str(data.shape)
 
 # TODO: Change this to test different classifiers.
-# from sklearn.svm import LinearSVC
+#from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 
 # Train with the sample data.
-clf = KNeighborsClassifier()
+kn_result = fit_and_score(KNeighborsClassifier(), x_train, x_test, y_train, y_test)
+#fit_and_score(LinearSVC(), x_train, x_test, y_train, y_test)
 
-# Profile time to fit.
-start = time.clock()
-print "Fitting with " + str(clf.fit(x_train, y_train))
-end = time.clock()
-
-# Profile prediction time.
-startPredict = time.clock()
-result = clf.score(x_test, y_test) #clf.predict(test)
-endPredict = time.clock()
-
-print "\nAccuracy: %0.2f%% (+/- %0.2f)" % (result.mean() * 100.0, result.std() * 2 * 100)
-
-print "\nTime to fit in seconds: %0.5f" % (end - start)
-print "Time to predict in seconds: %0.5f" % (endPredict - startPredict)
 
 #print result
 

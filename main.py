@@ -5,7 +5,6 @@ import time
 import pandas as pd
 from sklearn import cross_validation
 
-
 # Hash a string into a unique int.
 def hash_str(s):
     return int(hashlib.sha256(s).hexdigest(), 16)
@@ -51,25 +50,20 @@ x = data.ix[:, 0:14]
 # Choose results.
 y = data.ix[:, 15]
 
-# Format target as single array.
-yArr = []
-
-for i in y:
-    yArr.append(i)
-
 # Cross-validation data.
-x_train, x_test, y_train, y_test = cross_validation.train_test_split(x, yArr, test_size=0.4, random_state=0)
+x_train, x_test, y_train, y_test = cross_validation.train_test_split(x, y, test_size=0.4, random_state=0)
 
 print 'Samples, Features ' + str(data.shape)
 
 # TODO: Change this to test different classifiers.
-#from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 
 # Train with the sample data.
 kn_result = fit_and_score(KNeighborsClassifier(), x_train, x_test, y_train, y_test)
-#fit_and_score(LinearSVC(), x_train, x_test, y_train, y_test)
+svc_result = fit_and_score(LinearSVC(), x_train, x_test, y_train, y_test)
 
+print "Method 1 performs with %0.3f accuracy difference" % ((kn_result - svc_result) * 100.0)
 
 #print result
 

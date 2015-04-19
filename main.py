@@ -3,15 +3,16 @@ __author__ = 'Patrick Hardy'
 import hashlib
 import time
 import pandas as pd
-
+from sklearn import cross_validation
 
 # Hash a string into a unique int.
 def hash_str(s):
     return int(hashlib.sha256(s).hexdigest(), 16)
 
-#myData = np.genfromtxt("data_files\\crx.data.csv", dtype=float, delimiter=',', skip_header=0)
+#myData = np.genfromtxt("data_files\\Book1.csv", dtype=float, delimiter=',', skip_header=0)
 
 # Read the training data from csv.
+#crx.data.csv
 data = pd.read_csv("data_files\\crx.data.csv", header=None, engine='c', na_values=['?'], true_values=['+'],
                    false_values=['-'], error_bad_lines=True,
                    dtype={0: 'object', 1: 'float32', 2: 'float32', 3: 'object', 4: 'object', 5: 'object', 6: 'object',
@@ -24,7 +25,9 @@ data = pd.read_csv("data_files\\crx.data.csv", header=None, engine='c', na_value
 # Remove ? values all together.
 data = data.dropna()
 
+# Choose features.
 x = data.ix[:, 0:14]
+# Choose results.
 y = data.ix[:, 15]
 
 # Format target as single array.
@@ -33,10 +36,13 @@ yArr = []
 for i in y:
     yArr.append(i)
 
+# Cross-validation data.
+x_train, x_test, y_train, y_test = cross_validation.train_test_split(x, yArr, test_size=0.4, random_state=0)
+
 print 'Samples, Features ' + str(data.shape)
 
 # TODO: Change this to test different classifiers.
-from sklearn.svm import LinearSVC
+# from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 
 # Train with the sample data.
@@ -44,27 +50,27 @@ clf = KNeighborsClassifier()
 
 # Profile time to fit.
 start = time.clock()
-print "Fitting with " + str(clf.fit(x, yArr))
+print "Fitting with " + str(clf.fit(x_train, y_train))
 end = time.clock()
-
-print "\nTime to fit in seconds: " + str(end - start)
-
-# Test the original values to see if the same results are produced.
-test = x.ix[:, 0:14]
 
 # Profile prediction time.
-start = time.clock()
-result = clf.predict(test)
-end = time.clock()
+startPredict = time.clock()
+result = clf.score(x_test, y_test) #clf.predict(test)
+endPredict = time.clock()
 
-print "Time to predict in seconds: " + str(end - start)
+print "\nAccuracy: %0.2f%% (+/- %0.2f)" % (result.mean() * 100.0, result.std() * 2 * 100)
+
+print "\nTime to fit in seconds: %0.5f" % (end - start)
+print "Time to predict in seconds: %0.5f" % (endPredict - startPredict)
 
 #print result
 
+# Test the original values to see if the same results are produced, not really useful and can lean to over-fitting.
+#test = x.ix[:, 0:14]
 # Check for match percent.
-success_count = 0
-for index, item in enumerate(result.data):
-    if index < len(yArr) and item == yArr[index]:
-        success_count += 1
+#success_count = 0
+#for index, item in enumerate(result.data):
+#    if index < len(yArr) and item == yArr[index]:
+#        success_count += 1
 
-print 'Accuracy: ' + str((float(success_count) / float(len(yArr))) * 100.0)
+#print 'Accuracy: ' + str((float(success_count) / float(len(yArr))) * 100.0)

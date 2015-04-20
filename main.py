@@ -61,7 +61,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 # Train with the sample data.
 kn_result = fit_and_score(KNeighborsClassifier(algorithm='kd_tree', n_neighbors=5), x_train, x_test, y_train, y_test)
-svc_result = fit_and_score(LinearSVC(), x_train, x_test, y_train, y_test)
+svc_result = fit_and_score(LinearSVC(dual=False), x_train, x_test, y_train, y_test)
 
 print "Method 1 performs with %0.3f accuracy difference" % ((kn_result - svc_result) * 100.0)
 
